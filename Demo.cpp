@@ -3,11 +3,10 @@
 #include "DxContext.cpp"
 
 struct Demo {
-    pub static constexpr char* k_name = "Demo";
+    pub static constexpr char* k_name = "Rasterization";
     prv static constexpr u32 k_num_pipelines = 1;
 
-    prv ID3D12Resource* canvas;
-    prv ID3D12Resource* upload_buffers[2];
+    prv ID3D12Resource* fragments_buffer;
     prv ID3D12PipelineState* pipelines[k_num_pipelines];
     prv ID3D12RootSignature* rootsignatures[k_num_pipelines];
 
@@ -57,9 +56,10 @@ struct Demo {
             VHR(dx.device->CreateGraphicsPipelineState(&pso_desc, IID_PPV_ARGS(&self.pipelines[0])));
             VHR(dx.device->CreateRootSignature(0, vs_code.data(), vs_code.size(), IID_PPV_ARGS(&self.rootsignatures[0])));
         }
-
-        for (u32 i = 0; i < 2; ++i) {
-            VHR(dx.device->CreateCommittedResource(&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD), D3D12_HEAP_FLAG_NONE, &CD3DX12_RESOURCE_DESC::Buffer(64 * 1024), D3D12_RESOURCE_STATE_GENERIC_READ, nullptr, IID_PPV_ARGS(&self.upload_buffers[i])));
+        /* buffer that stores window-space position of each fragment */ {
+            auto buffer_desc = CD3DX12_RESOURCE_DESC::Buffer(dx.resolution[0] * dx.resolution[1] * sizeof(XMFLOAT2));
+            buffer_desc.Flags = D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS;
+            VHR(dx.device->CreateCommittedResource(&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT), D3D12_HEAP_FLAG_ALLOW_SHADER_ATOMICS, &buffer_desc, D3D12_RESOURCE_STATE_UNORDERED_ACCESS, nullptr, IID_PPV_ARGS(&self.fragments_buffer)));
         }
     }
 
@@ -83,6 +83,7 @@ struct Demo {
         cmdlist->OMSetRenderTargets(1, &back_buffer_descriptor, 0, nullptr);
         cmdlist->ClearRenderTargetView(back_buffer_descriptor, XMVECTORF32{ 0.0f, 0.2f, 0.4f, 1.0f }, 0, nullptr);
 
+        cmdlist->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
         cmdlist->SetPipelineState(self.pipelines[0]);
         cmdlist->SetGraphicsRootSignature(self.rootsignatures[0]);
         cmdlist->DrawInstanced(3, 1, 0, 0);

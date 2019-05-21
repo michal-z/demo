@@ -147,7 +147,7 @@ struct DxContext {
         descriptor_out.ptr += self.back_buffer_index * self.descriptor_size_rtv;
     }
 
-    pub fn inline void getDepthstencilBuffer(const DxContext& self, ID3D12Resource*& buffer_out, D3D12_CPU_DESCRIPTOR_HANDLE& descriptor_out) {
+    pub fn inline void getDepthStencilBuffer(const DxContext& self, ID3D12Resource*& buffer_out, D3D12_CPU_DESCRIPTOR_HANDLE& descriptor_out) {
         buffer_out = self.ds_buffer;
         descriptor_out = self.ds_heap.cpu_start;
     }
