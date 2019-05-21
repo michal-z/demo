@@ -6,12 +6,13 @@ struct Demo {
     pub static constexpr char* k_name = "Demo";
     prv static constexpr u32 k_num_pipelines = 1;
 
+    prv ID3D12Resource* canvas;
     prv ID3D12Resource* upload_buffers[2];
     prv ID3D12PipelineState* pipelines[k_num_pipelines];
     prv ID3D12RootSignature* rootsignatures[k_num_pipelines];
 
     pub fn i32 run(Demo& self) {
-        HWND window = Common::create_window(k_name, 1920, 1080);
+        HWND window = Common::createWindow(k_name, 1920, 1080);
 
         DxContext dx = {};
         DxContext::init(dx, window);
@@ -28,7 +29,7 @@ struct Demo {
             } else {
                 f64 time;
                 f32 delta_time;
-                Common::update_frame_stats(window, k_name, time, delta_time);
+                Common::updateFrameStats(window, k_name, time, delta_time);
                 draw(self, dx);
                 DxContext::present(dx);
             }
@@ -38,8 +39,8 @@ struct Demo {
 
     prv fn void init(Demo& self, DxContext& dx) {
         /* VS_0, PS_0 */ {
-            std::vector<u8> vs_code = Common::load_file("Data/Shaders/0.vs.cso");
-            std::vector<u8> ps_code = Common::load_file("Data/Shaders/0.ps.cso");
+            std::vector<u8> vs_code = Common::loadFile("Data/Shaders/0.vs.cso");
+            std::vector<u8> ps_code = Common::loadFile("Data/Shaders/0.ps.cso");
 
             D3D12_GRAPHICS_PIPELINE_STATE_DESC pso_desc = {};
             pso_desc.VS = { vs_code.data(), vs_code.size() };
@@ -68,14 +69,14 @@ struct Demo {
         dx.cmdalloc[dx.frame_index]->Reset();
         cmdlist->Reset(dx.cmdalloc[dx.frame_index], nullptr);
 
-        DxContext::set_descriptor_heap(dx);
+        DxContext::setDescriptorHeap(dx);
 
         cmdlist->RSSetViewports(1, &D3D12_VIEWPORT{ 0.0f, 0.0f, (f32)dx.resolution[0], (f32)dx.resolution[1], 0.0f, 1.0f });
         cmdlist->RSSetScissorRects(1, &D3D12_RECT{ 0, 0, (LONG)dx.resolution[0], (LONG)dx.resolution[1] });
 
         ID3D12Resource* back_buffer;
         D3D12_CPU_DESCRIPTOR_HANDLE back_buffer_descriptor;
-        DxContext::get_back_buffer(dx, back_buffer, back_buffer_descriptor);
+        DxContext::getBackBuffer(dx, back_buffer, back_buffer_descriptor);
 
         cmdlist->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(back_buffer, D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET));
 

@@ -1,7 +1,7 @@
 #pragma once
 
 struct Common {
-    pub fn std::vector<u8> load_file(const char* filename) {
+    pub fn std::vector<u8> loadFile(const char* filename) {
         FILE* file = fopen(filename, "rb");
         assert(file);
         fseek(file, 0, SEEK_END);
@@ -14,17 +14,17 @@ struct Common {
         return content;
     }
 
-    pub fn void update_frame_stats(HWND window, const char* name, f64& time_out, f32& delta_time_out) {
+    pub fn void updateFrameStats(HWND window, const char* name, f64& time_out, f32& delta_time_out) {
         static f64 previous_time = -1.0;
         static f64 header_refresh_time = 0.0;
         static u32 frame_count = 0;
 
         if (previous_time < 0.0) {
-            previous_time = get_time();
+            previous_time = getTime();
             header_refresh_time = previous_time;
         }
 
-        time_out = get_time();
+        time_out = getTime();
         delta_time_out = (f32)(time_out - previous_time);
         previous_time = time_out;
 
@@ -40,7 +40,7 @@ struct Common {
         frame_count++;
     }
 
-    pub fn f64 get_time() {
+    pub fn f64 getTime() {
         static LARGE_INTEGER start_counter;
         static LARGE_INTEGER frequency;
         if (start_counter.QuadPart == 0) {
@@ -52,9 +52,9 @@ struct Common {
         return (counter.QuadPart - start_counter.QuadPart) / (f64)frequency.QuadPart;
     }
 
-    pub fn HWND create_window(const char* name, u32 width, u32 height) {
+    pub fn HWND createWindow(const char* name, u32 width, u32 height) {
         WNDCLASS winclass = {};
-        winclass.lpfnWndProc = process_window_message;
+        winclass.lpfnWndProc = processWindowMessage;
         winclass.hInstance = GetModuleHandle(nullptr);
         winclass.hCursor = LoadCursor(nullptr, IDC_ARROW);
         winclass.lpszClassName = name;
@@ -73,7 +73,7 @@ struct Common {
         return window;
     }
 
-    prv fn LRESULT CALLBACK process_window_message(HWND window, UINT message, WPARAM wparam, LPARAM lparam) {
+    prv fn LRESULT CALLBACK processWindowMessage(HWND window, UINT message, WPARAM wparam, LPARAM lparam) {
         switch (message) {
         case WM_DESTROY:
             PostQuitMessage(0);
