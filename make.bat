@@ -11,8 +11,8 @@ set SHADER_END=0
 for /L %%G in (%SHADER_BEGIN%,1,%SHADER_END%) do (
     if exist Data\Shaders\%%G.vs.cso del Data\Shaders\%%G.vs.cso
     if exist Data\Shaders\%%G.ps.cso del Data\Shaders\%%G.ps.cso
-    %HLSLC% /D VS_%%G /E vertex_main /Fo Data\Shaders\%%G.vs.cso /T vs_6_0 %NAME%.hlsl & if !ERRORLEVEL! neq 0 (goto :end)
-    %HLSLC% /D PS_%%G /E pixel_main /Fo Data\Shaders\%%G.ps.cso /T ps_6_0 %NAME%.hlsl & if !ERRORLEVEL! neq 0 (goto :end)
+    %HLSLC% /D VS_%%G /E vertexMain /Fo Data\Shaders\%%G.vs.cso /T vs_6_0 %NAME%.hlsl & if !ERRORLEVEL! neq 0 (goto :end)
+    %HLSLC% /D PS_%%G /E pixelMain /Fo Data\Shaders\%%G.ps.cso /T ps_6_0 %NAME%.hlsl & if !ERRORLEVEL! neq 0 (goto :end)
 )
 
 set RELEASE=/Zi /O2 /DNDEBUG /MT
