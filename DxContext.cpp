@@ -1,9 +1,7 @@
 #pragma once
 
-struct DxContext
-{
-    prv struct DescriptorHeap
-    {
+struct DxContext {
+    prv struct DescriptorHeap {
         ID3D12DescriptorHeap* heap;
         D3D12_CPU_DESCRIPTOR_HANDLE cpu_start;
         D3D12_GPU_DESCRIPTOR_HANDLE gpu_start;
@@ -31,8 +29,7 @@ struct DxContext
     prv HANDLE frame_fence_event;
     prv u64 frame_count;
 
-    pub fn void init(DxContext& self, HWND window)
-    {
+    pub fn void init(DxContext& self, HWND window) {
         IDXGIFactory4* factory;
 #ifdef _DEBUG
         VHR(CreateDXGIFactory2(DXGI_CREATE_FACTORY_DEBUG, IID_PPV_ARGS(&factory)));
@@ -127,8 +124,7 @@ struct DxContext
         self.frame_fence_event = CreateEventEx(nullptr, nullptr, 0, EVENT_ALL_ACCESS);
     }
 
-    pub fn void shutdown(DxContext& self)
-    {
+    pub fn void shutdown(DxContext& self) {
         // @Incomplete: Release all resources.
         SAFE_RELEASE(self.cmdlist);
         SAFE_RELEASE(self.cmdalloc[0]);
@@ -145,21 +141,18 @@ struct DxContext
         SAFE_RELEASE(self.device);
     }
 
-    pub fn inline void get_back_buffer(const DxContext& self, ID3D12Resource*& buffer_out, D3D12_CPU_DESCRIPTOR_HANDLE& descriptor_out)
-    {
+    pub fn inline void get_back_buffer(const DxContext& self, ID3D12Resource*& buffer_out, D3D12_CPU_DESCRIPTOR_HANDLE& descriptor_out) {
         buffer_out = self.swapbuffers[self.back_buffer_index];
         descriptor_out = self.rt_heap.cpu_start;
         descriptor_out.ptr += self.back_buffer_index * self.descriptor_size_rtv;
     }
 
-    pub fn inline void get_depthstencil_buffer(const DxContext& self, ID3D12Resource*& buffer_out, D3D12_CPU_DESCRIPTOR_HANDLE& descriptor_out)
-    {
+    pub fn inline void get_depthstencil_buffer(const DxContext& self, ID3D12Resource*& buffer_out, D3D12_CPU_DESCRIPTOR_HANDLE& descriptor_out) {
         buffer_out = self.ds_buffer;
         descriptor_out = self.ds_heap.cpu_start;
     }
 
-    pub fn void allocate_descriptors(DxContext& self, D3D12_DESCRIPTOR_HEAP_TYPE type, u32 count, D3D12_CPU_DESCRIPTOR_HANDLE& cpu_out)
-    {
+    pub fn void allocate_descriptors(DxContext& self, D3D12_DESCRIPTOR_HEAP_TYPE type, u32 count, D3D12_CPU_DESCRIPTOR_HANDLE& cpu_out) {
         u32 descriptor_size;
         DescriptorHeap& heap = get_descriptor_heap(self, type, D3D12_DESCRIPTOR_HEAP_FLAG_NONE, descriptor_size);
         assert((heap.size + count) < heap.capacity);
@@ -167,8 +160,7 @@ struct DxContext
         heap.size += count;
     }
 
-    pub fn void allocate_descriptors(DxContext& self, u32 count, D3D12_CPU_DESCRIPTOR_HANDLE& cpu_out, D3D12_GPU_DESCRIPTOR_HANDLE& gpu_out)
-    {
+    pub fn void allocate_descriptors(DxContext& self, u32 count, D3D12_CPU_DESCRIPTOR_HANDLE& cpu_out, D3D12_GPU_DESCRIPTOR_HANDLE& gpu_out) {
         u32 descriptor_size;
         DescriptorHeap& heap = get_descriptor_heap(self, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE, descriptor_size);
         assert((heap.size + count) < heap.capacity);
@@ -179,8 +171,7 @@ struct DxContext
         heap.size += count;
     }
 
-    pub fn void present(DxContext& self)
-    {
+    pub fn void present(DxContext& self) {
         self.swapchain->Present(0, 0);
         self.cmdqueue->Signal(self.frame_fence, ++self.frame_count);
 
@@ -196,20 +187,17 @@ struct DxContext
         self.gpu_descriptor_heaps[self.frame_index].size = 0;
     }
 
-    pub fn void wait_for_frame_fence(DxContext& self)
-    {
+    pub fn void wait_for_frame_fence(DxContext& self) {
         self.cmdqueue->Signal(self.frame_fence, ++self.frame_count);
         self.frame_fence->SetEventOnCompletion(self.frame_count, self.frame_fence_event);
         WaitForSingleObject(self.frame_fence_event, INFINITE);
     }
 
-    pub fn inline void set_descriptor_heap(const DxContext& self)
-    {
+    pub fn inline void set_descriptor_heap(const DxContext& self) {
         self.cmdlist->SetDescriptorHeaps(1, &self.gpu_descriptor_heaps[self.frame_index].heap);
     }
 
-    prv fn DescriptorHeap& get_descriptor_heap(DxContext& self, D3D12_DESCRIPTOR_HEAP_TYPE type, D3D12_DESCRIPTOR_HEAP_FLAGS flags, u32& descriptor_size_out)
-    {
+    prv fn DescriptorHeap& get_descriptor_heap(DxContext& self, D3D12_DESCRIPTOR_HEAP_TYPE type, D3D12_DESCRIPTOR_HEAP_FLAGS flags, u32& descriptor_size_out) {
         if (type == D3D12_DESCRIPTOR_HEAP_TYPE_RTV) {
             descriptor_size_out = self.descriptor_size_rtv;
             return self.rt_heap;
@@ -229,8 +217,7 @@ struct DxContext
         return self.cpu_descriptor_heap;
     }
 
-    prv fn void init_descriptor_heaps(DxContext& self)
-    {
+    prv fn void init_descriptor_heaps(DxContext& self) {
         /* render target descriptor heap (RTV) */ {
             self.rt_heap.capacity = 16;
 

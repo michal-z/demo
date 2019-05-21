@@ -2,8 +2,7 @@
 #include "Common.cpp"
 #include "DxContext.cpp"
 
-struct Demo
-{
+struct Demo {
     pub static constexpr char* k_name = "Demo";
     prv static constexpr u32 k_num_pipelines = 1;
 
@@ -11,8 +10,7 @@ struct Demo
     prv ID3D12PipelineState* pipelines[k_num_pipelines];
     prv ID3D12RootSignature* rootsignatures[k_num_pipelines];
 
-    pub fn i32 run(Demo& self)
-    {
+    pub fn i32 run(Demo& self) {
         HWND window = Common::create_window(k_name, 1920, 1080);
 
         DxContext dx = {};
@@ -38,8 +36,7 @@ struct Demo
         return 0;
     }
 
-    prv fn void init(Demo& self, DxContext& dx)
-    {
+    prv fn void init(Demo& self, DxContext& dx) {
         /* VS_0, PS_0 */ {
             std::vector<u8> vs_code = Common::load_file("Data/Shaders/0.vs.cso");
             std::vector<u8> ps_code = Common::load_file("Data/Shaders/0.ps.cso");
@@ -65,8 +62,7 @@ struct Demo
         }
     }
 
-    prv fn void draw(Demo& self, DxContext& dx)
-    {
+    prv fn void draw(Demo& self, DxContext& dx) {
         ID3D12GraphicsCommandList* cmdlist = dx.cmdlist;
 
         dx.cmdalloc[dx.frame_index]->Reset();
