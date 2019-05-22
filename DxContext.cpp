@@ -1,3 +1,4 @@
+struct DxContext;
 #pragma once
 
 struct DxContext {
@@ -9,8 +10,8 @@ struct DxContext {
         u32 capacity;
     };
 
-    pub ID3D12Device2* device;
-    pub ID3D12GraphicsCommandList* cmdlist;
+    pub ID3D12Device3* device;
+    pub ID3D12GraphicsCommandList2* cmdlist;
     pub ID3D12CommandQueue* cmdqueue;
     pub ID3D12CommandAllocator* cmdalloc[2];
     pub u32 resolution[2];
@@ -141,13 +142,13 @@ struct DxContext {
         SAFE_RELEASE(self.device);
     }
 
-    pub fn inline void getBackBuffer(const DxContext& self, ID3D12Resource*& buffer_out, D3D12_CPU_DESCRIPTOR_HANDLE& descriptor_out) {
+    pub fn void getBackBuffer(const DxContext& self, ID3D12Resource*& buffer_out, D3D12_CPU_DESCRIPTOR_HANDLE& descriptor_out) {
         buffer_out = self.swapbuffers[self.back_buffer_index];
         descriptor_out = self.rt_heap.cpu_start;
         descriptor_out.ptr += self.back_buffer_index * self.descriptor_size_rtv;
     }
 
-    pub fn inline void getDepthStencilBuffer(const DxContext& self, ID3D12Resource*& buffer_out, D3D12_CPU_DESCRIPTOR_HANDLE& descriptor_out) {
+    pub fn void getDepthStencilBuffer(const DxContext& self, ID3D12Resource*& buffer_out, D3D12_CPU_DESCRIPTOR_HANDLE& descriptor_out) {
         buffer_out = self.ds_buffer;
         descriptor_out = self.ds_heap.cpu_start;
     }
@@ -193,7 +194,7 @@ struct DxContext {
         WaitForSingleObject(self.frame_fence_event, INFINITE);
     }
 
-    pub fn inline void setDescriptorHeap(const DxContext& self) {
+    pub fn void setDescriptorHeap(const DxContext& self) {
         self.cmdlist->SetDescriptorHeaps(1, &self.gpu_descriptor_heaps[self.frame_index].heap);
     }
 

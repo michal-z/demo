@@ -1,7 +1,8 @@
 //=================================================================================================
 #if defined(VS_0) || defined(PS_0)
 
-#define k_rsi "RootFlags(0)"
+#define k_rsi "RootFlags(0), " \
+	"DescriptorTable(UAV(u0), visibility = SHADER_VISIBILITY_PIXEL)"
 
 //-------------------------------------------------------------------------------------------------
 #if defined(VS_0)
@@ -14,8 +15,15 @@ float4 vertexMain(uint vertex_id : SV_VertexID) : SV_Position {
 //-------------------------------------------------------------------------------------------------
 #elif defined(PS_0)
 
+struct Fragment {
+	float2 position;
+};
+RWStructuredBuffer<Fragment> uav_fragments : register(u0);
+
 [RootSignature(k_rsi)]
 float4 pixelMain(float4 position : SV_Position) : SV_Target0 {
+	uint index = uav_fragments.IncrementCounter();
+	uav_fragments[index].position = position.xy;
     return float4(0.0f, 0.5f, 0.0f, 0.0f);
 }
 //=================================================================================================

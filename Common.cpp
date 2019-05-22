@@ -1,3 +1,4 @@
+struct Common;
 #pragma once
 
 struct Common {
